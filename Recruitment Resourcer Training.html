@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recruitment Resourcer Training – Winlight Recruitment</title>
+<style>
+  :root {
+    --navy: #042c4c;
+    --blue: #86bbd8;
+    --light-blue: #d6eaf5;
+    --white: #ffffff;
+    --green: #27ae60;
+    --amber: #f39c12;
+    --light-grey: #f4f7fa;
+    --mid-grey: #e0e8f0;
+    --text: #1a2e40;
+    --border: #ccdce9;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--light-grey); color: var(--text); min-height: 100vh; }
+
+  /* HEADER */
+  .header { background: var(--navy); padding: 18px 40px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,0.25); }
+  .header img { height: 48px; }
+  .header-title { color: white; text-align: right; }
+  .header-title h1 { font-size: 1.15rem; font-weight: 700; letter-spacing: 0.3px; }
+  .header-title p { font-size: 0.78rem; color: var(--blue); margin-top: 3px; }
+
+  /* PROGRESS */
+  .progress-section { background: white; padding: 18px 40px; border-bottom: 3px solid var(--blue); }
+  .progress-label { display: flex; justify-content: space-between; font-size: 0.83rem; color: var(--navy); font-weight: 600; margin-bottom: 7px; }
+  .progress-bar-bg { background: var(--mid-grey); border-radius: 20px; height: 13px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--navy), var(--blue)); border-radius: 20px; transition: width 0.5s ease; }
+  .progress-stats { display: flex; gap: 24px; margin-top: 10px; font-size: 0.78rem; color: #666; }
+  .stat-badge { display: inline-flex; align-items: center; gap: 5px; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+  .dot.done { background: var(--green); }
+  .dot.inprog { background: var(--amber); }
+  .dot.todo { background: var(--mid-grey); border: 1px solid #bbb; }
+
+  /* LAYOUT */
+  .main { display: flex; max-width: 1200px; margin: 0 auto; padding: 22px 20px; gap: 22px; }
+  .sidebar { width: 215px; flex-shrink: 0; }
+  .week-nav { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.08); position: sticky; top: 16px; }
+  .week-nav-title { background: var(--navy); color: white; padding: 11px 15px; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; }
+  .week-btn { display: block; width: 100%; text-align: left; padding: 10px 15px; border: none; background: none; cursor: pointer; font-size: 0.82rem; color: var(--text); border-left: 3px solid transparent; transition: all 0.15s; border-bottom: 1px solid var(--mid-grey); }
+  .week-btn:hover { background: var(--light-blue); color: var(--navy); }
+  .week-btn.active { background: var(--light-blue); border-left-color: var(--navy); font-weight: 700; color: var(--navy); }
+  .week-progress-mini { font-size: 0.68rem; color: #999; margin-top: 2px; }
+  .legend { background: white; border-radius: 10px; padding: 13px 15px; margin-top: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+  .legend-title { font-size: 0.72rem; font-weight: 700; color: var(--navy); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 9px; }
+  .legend-item { display: flex; align-items: center; gap: 7px; margin-bottom: 6px; font-size: 0.72rem; color: var(--text); }
+
+  /* CONTENT */
+  .content { flex: 1; min-width: 0; }
+  .week-panel { display: none; }
+  .week-panel.active { display: block; }
+  .week-header { background: var(--navy); color: white; border-radius: 10px 10px 0 0; padding: 16px 22px; display: flex; align-items: center; justify-content: space-between; }
+  .week-header h2 { font-size: 1.1rem; font-weight: 700; }
+  .week-header .week-dates { font-size: 0.77rem; color: var(--blue); margin-top: 2px; }
+  .week-badge { background: var(--blue); color: var(--navy); padding: 4px 12px; border-radius: 20px; font-size: 0.72rem; font-weight: 700; }
+  .week-body { background: white; border-radius: 0 0 10px 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); overflow: hidden; margin-bottom: 20px; }
+
+  /* MODULES */
+  .module { border-bottom: 1px solid var(--mid-grey); }
+  .module:last-child { border-bottom: none; }
+  .module-header { display: flex; align-items: center; padding: 13px 18px; cursor: pointer; gap: 11px; user-select: none; }
+  .module-header:hover { background: var(--light-grey); }
+  .module-check { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--mid-grey); background: white; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 0.78rem; transition: all 0.2s; color: transparent; }
+  .module-check.done { background: var(--green); border-color: var(--green); color: white; }
+  .module-check.in-progress { background: var(--amber); border-color: var(--amber); color: white; }
+  .module-emoji { font-size: 1.05rem; flex-shrink: 0; }
+  .module-info { flex: 1; min-width: 0; }
+  .module-title { font-size: 0.88rem; font-weight: 600; color: var(--navy); line-height: 1.3; }
+  .module-meta { font-size: 0.72rem; color: #888; margin-top: 2px; }
+  .module-type { font-size: 0.67rem; padding: 2px 8px; border-radius: 10px; font-weight: 700; white-space: nowrap; flex-shrink: 0; text-transform: uppercase; letter-spacing: 0.3px; }
+  .type-self { background: #e8f5e9; color: #2e7d32; }
+  .type-trained { background: #e3f2fd; color: #1565c0; }
+  .type-roleplay { background: #fce4ec; color: #c62828; }
+  .type-checkin { background: #fff3e0; color: #e65100; }
+  .type-assessment { background: #f3e5f5; color: #6a1b9a; }
+  .expand-icon { color: #bbb; font-size: 0.75rem; transition: transform 0.2s; flex-shrink: 0; }
+  .module.open .expand-icon { transform: rotate(90deg); }
+  .module-body { display: none; padding: 0 18px 16px 53px; background: #fafcff; border-top: 1px dashed var(--border); }
+  .module.open .module-body { display: block; }
+  .module-body-inner { padding-top: 14px; }
+
+  /* BODY SECTIONS */
+  .body-section { margin-bottom: 14px; }
+  .body-section h4 { font-size: 0.75rem; color: var(--navy); font-weight: 700; margin-bottom: 7px; text-transform: uppercase; letter-spacing: 0.4px; padding-bottom: 4px; border-bottom: 1px solid var(--border); }
+  .body-section p { font-size: 0.82rem; line-height: 1.6; color: var(--text); margin-bottom: 6px; }
+  .body-section ul { padding-left: 17px; }
+  .body-section li { font-size: 0.82rem; color: var(--text); margin-bottom: 5px; line-height: 1.5; }
+  .body-section li strong { color: var(--navy); }
+
+  /* KEY TERM CARDS */
+  .term-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: 6px; }
+  .term-card { background: white; border: 1px solid var(--border); border-radius: 7px; padding: 9px 11px; border-left: 3px solid var(--blue); }
+  .term-card .term { font-size: 0.75rem; font-weight: 700; color: var(--navy); margin-bottom: 3px; }
+  .term-card .def { font-size: 0.75rem; color: #555; line-height: 1.4; }
+
+  /* TIPS BOX */
+  .tip-box { background: #fffde7; border: 1px solid #ffe082; border-radius: 8px; padding: 10px 13px; margin-bottom: 12px; font-size: 0.8rem; line-height: 1.5; color: #5d4037; }
+  .tip-box strong { color: #e65100; }
+
+  /* QUIZ */
+  .quiz-section { margin-top: 14px; }
+  .quiz-section h4 { font-size: 0.75rem; color: var(--navy); font-weight: 700; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.4px; padding-bottom: 4px; border-bottom: 1px solid var(--border); }
+  .quiz-q { background: white; border: 1px solid var(--border); border-radius: 8px; padding: 12px 13px; margin-bottom: 9px; }
+  .quiz-q p { font-size: 0.82rem; font-weight: 600; margin-bottom: 8px; color: var(--navy); }
+  .quiz-opt { display: block; padding: 7px 11px; border-radius: 6px; font-size: 0.78rem; cursor: pointer; margin-bottom: 4px; border: 1px solid var(--border); background: white; text-align: left; width: 100%; transition: all 0.15s; }
+  .quiz-opt:hover:not(:disabled) { background: var(--light-blue); border-color: var(--blue); }
+  .quiz-opt.correct { background: #e8f5e9; border-color: #81c784; color: #2e7d32; font-weight: 600; }
+  .quiz-opt.wrong { background: #ffebee; border-color: #ef9a9a; color: #c62828; }
+  .quiz-opt.reveal { background: #e8f5e9; border-color: #81c784; color: #2e7d32; font-weight: 600; opacity: 0.7; }
+  .quiz-feedback { font-size: 0.74rem; margin-top: 7px; padding: 7px 10px; border-radius: 6px; line-height: 1.4; }
+  .quiz-feedback.correct { background: #e8f5e9; color: #2e7d32; }
+  .quiz-feedback.wrong { background: #ffebee; color: #c62828; }
+
+  /* STATUS */
+  .status-controls { display: flex; gap: 8px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
+  .status-btn { padding: 6px 14px; border-radius: 20px; border: none; cursor: pointer; font-size: 0.73rem; font-weight: 700; transition: all 0.2s; letter-spacing: 0.2px; }
+  .status-btn.start { background: var(--amber); color: white; }
+  .status-btn.start:hover { background: #e67e22; }
+  .status-btn.complete { background: var(--green); color: white; }
+  .status-btn.complete:hover { background: #1e8449; }
+  .status-btn.reset { background: var(--mid-grey); color: #555; }
+  .status-btn.reset:hover { background: #bbb; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <img src="data:image/png;base64,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" alt="Winlight Recruitment" />
+  <div class="header-title">
+    <h1>Recruitment Resourcer Training</h1>
+    <p>Chhavi Srivastava &nbsp;·&nbsp; Start Date: 6 July 2026 &nbsp;·&nbsp; 5-Week Programme</p>
+  </div>
+</div>
+
+<div class="progress-section">
+  <div class="progress-label">
+    <span>Overall Progress</span>
+    <span id="progress-pct">0% complete</span>
+  </div>
+  <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-bar" style="width:0%"></div></div>
+  <div class="progress-stats">
+    <span class="stat-badge"><span class="dot done"></span> <span id="count-done">0</span> completed</span>
+    <span class="stat-badge"><span class="dot inprog"></span> <span id="count-inprog">0</span> in progress</span>
+    <span class="stat-badge"><span class="dot todo"></span> <span id="count-todo">0</span> not started</span>
+  </div>
+</div>
+
+<div class="main">
+  <div class="sidebar">
+    <div class="week-nav">
+      <div class="week-nav-title">Jump to Week</div>
+      <button class="week-btn active" onclick="showWeek(1,this)">Week 1 — Sector Knowledge<div class="week-progress-mini" id="mini-1">0 / 0 done</div></button>
+      <button class="week-btn" onclick="showWeek(2,this)">Week 2 — Systems & Live<div class="week-progress-mini" id="mini-2">0 / 0 done</div></button>
+      <button class="week-btn" onclick="showWeek(3,this)">Week 3 — Live Coaching<div class="week-progress-mini" id="mini-3">0 / 0 done</div></button>
+      <button class="week-btn" onclick="showWeek(4,this)">Week 4 — Consolidation<div class="week-progress-mini" id="mini-4">0 / 0 done</div></button>
+      <button class="week-btn" onclick="showWeek(5,this)">Week 5 — Assessment<div class="week-progress-mini" id="mini-5">0 / 0 done</div></button>
+    </div>
+    <div class="legend" style="margin-top:14px;">
+      <div class="legend-title">Module Types</div>
+      <div class="legend-item"><span class="module-type type-self">SELF-LEARN</span> Read independently</div>
+      <div class="legend-item"><span class="module-type type-trained">TRAINED</span> With your trainer</div>
+      <div class="legend-item"><span class="module-type type-roleplay">ROLE PLAY</span> Practice activity</div>
+      <div class="legend-item"><span class="module-type type-checkin">CHECK-IN</span> Team review</div>
+      <div class="legend-item"><span class="module-type type-assessment">ASSESSMENT</span> Formal review</div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ═══════════════════ WEEK 1 ═══════════════════ -->
+    <div class="week-panel active" id="week-1">
+      <div class="week-header">
+        <div><h2>Week 1 — Sector Knowledge & Orientation</h2><div class="week-dates">7–11 July 2026</div></div>
+        <div class="week-badge" id="badge-1">0%</div>
+      </div>
+      <div class="week-body">
+
+        <!-- W1 M1: Welcome -->
+        <div class="module" id="mod-w1-1">
+          <div class="module-header" onclick="toggleModule('mod-w1-1')">
+            <div class="module-check" id="check-mod-w1-1"></div>
+            <div class="module-emoji">🎉</div>
+            <div class="module-info"><div class="module-title">Welcome & Team Induction</div><div class="module-meta">Mon 7 Jul · Trainer-led · ~2 hours</div></div>
+            <span class="module-type type-trained">TRAINED</span><span class="expand-icon">▶</span>
+          </div>
+          <div class="module-body"><div class="module-body-inner">
+            <div class="body-section">
+              <h4>📌 What you'll cover</h4>
+              <ul>
+                <li><strong>Meet the team:</strong> Jess Brooks (your line manager), Kaz Rajani, and the wider SCH division. You'll do a round of introductions and learn who does what.</li>
+                <li><strong>Office setup:</strong> Desk, phone, laptop login, email, Teams, and access to the CRM. Raise any IT issues on Day 1.</li>
+                <li><strong>Winlight values:</strong> Honesty, responsiveness, expertise and partnership. These shape how we communicate with candidates and clients.</li>
+                <li><strong>Your 5-week programme:</strong> Walk through this training guide together. Understand what each week involves and what "signed off" looks like at Week 5.</li>
+                <li><strong>House rules:</strong> Core hours, absence reporting, desk etiquette, use of personal phones during work hours.</li>
+              </ul>
+            </div>
+            <div class="tip-box"><strong>💡 Tip for Day 1:</strong> Write down the names of everyone you meet and their role. It'll help you enormously in Week 2 when you need to know who to go to for what.</div>
+            <div class="status-controls">
+              <button class="status-btn start" onclick="setStatus('mod-w1-1','in-progress')">▶ In Progress</button>
+              <button class="status-btn complete" onclick="setStatus('mod-w1-1','done')">✓ Complete</button>
+              <button class="status-btn reset" onclick="setStatus('mod-w1-1','todo')">↺ Reset</button>
+            </div>
+          </div></div>
+        </div>
+
+        <!-- W1 M2: Winlight & SCH -->
+        <div class="module" id="mod-w1-2">
+          <div class="module-header" onclick="toggleModule('mod-w1-2')">
+            <div class="module-check" id="check-mod-w1-2"></div>
+            <div class="module-emoji">🏢</div>
+            <div class="module-info"><div class="module-title">Winlight & the SCH Division</div><div class="module-meta">Mon 7 Jul · Self-learn pp.1–8 · ~45 mins</div></div>
+            <span class="module-type type-self">SELF-LEARN</span><span class="expand-icon">▶</span>
+          </div>
+          <div class="module-body"><div class="module-body-inner">
+            <div class="body-section">
+              <h4>📌 What to learn</h4>
+              <ul>
+                <li><strong>Winlight's sectors:</strong> Social Care & Housing (SCH) is our core division. We also work across other sectors — understand where SCH sits and why it's specialist.</li>
+                <li><strong>The SCH team structure:</strong> Delivery Consultants own the client relationships and manage the vacancy. Resourcers source and screen candidates to fill those vacancies. You report into a Delivery Consultant.</li>
+                <li><strong>Types of recruitment:</strong> Permanent (perm) placements earn a fee on start date. Temporary (temp) workers earn us a margin on every hour worked. Contract roles are fixed-term. Understand the difference — it affects how urgently you need to fill a role.</li>
+                <li><strong>Our clients:</strong> Registered care providers, housing associations, supported living services and local authorities. They're regulated by the CQC (Care Quality Commission) and need workers fast — that's where Winlight adds value.</li>
+              </ul>
+            </div>
+            <div class="body-section">
+              <h4>🔑 Key Terms</h4>
+              <div class="term-grid">
+                <div class="term-card"><div class="term">SCH</div><div class="def">Social Care & Housing — Winlight's specialist division</div></div>
+                <div class="term-card"><div class="term">Delivery Consultant</div><div class="def">Senior recruiter who manages client relationships and owns vacancies</div></div>
+                <div class="term-card"><div class="term">Perm placement</div><div class="def">Candidate hired permanently; fee invoiced on their start date</div></div>
+                <div class="term-card"><div class="term">Temp margin</div><div class="def">The difference between what we charge the client and what we pay the candidate per hour</div></div>
+                <div class="term-card"><div class="term">CQC</div><div class="def">Care Quality Commission — the regulator for health and social care in England</div></div>
+                <div class="term-card"><div class="term">Vacancy</div><div class="def">An open job role a client needs filled</div></div>
+              </div>
+            </div>
+            <div class="quiz-section">
+              <h4>🧠 Knowledge Check</h4>
+              <div class="quiz-q" id="qw1-2-1">
+                <p>What is the key difference between a Resourcer and a Delivery Consultant?</p>
+                <button class="quiz-opt" onclick="answerQ(this,false,'qw1-2-1')">A Resourcer manages client relationships; a Delivery Consultant sources candidates</button>
+                <button class="quiz-opt" onclick="answerQ(this,true,'qw1-2-1')">A Resourcer sources and screens candidates; a Delivery Consultant owns the client relationship and vacancy</button>
+                <button class="quiz-opt" onclick="answerQ(this,false,'qw1-2-1')">They do the same job at different seniority levels</button>
+              </div>
+              <div class="quiz-q" id="qw1-2-2">
+                <p>If a candidate is placed in a temporary role, when does Winlight earn revenue?</p>
+                <button class="quiz-opt" onclick="answerQ(this,false,'qw1-2-2')">A one-off fee when the candidate starts</button>
+                <button class="quiz-opt" onclick="answerQ(this,true,'qw1-2-2')">A margin on every hour the candidate works</button>
+                <button class="quiz-opt" onclick="answerQ(this,false,'qw1-2-2')">A fee at the end of the contract</button>
+              </div>
+            </div>
+            <div class="status-controls">
+              <button class="status-btn start" onclick="setStatus('mod-w1-2','in-progress')">▶ In Progress</button>
+              <button class="status-btn complete" onclick="setStatus('mod-w1-2','done')">✓ Complete</button>
+              <button class="status-btn reset" onclick="setStatus('mod-w1-2','todo')">↺ Reset</button>
+            </div>
+          </div></div>
+        </div>
+
+        <!-- W1 M3: Social Care Sector -->
+        <div class="module" id="mod-w1-3">
+          <div class="module-header" onclick="toggleModule('mod-w1-3')">
+            <div class="module-check" id="check-mod-w1-3"></div>
+            <div class="module-emoji">📖</div>
+            <div class="module-info"><div class="module-title">Social Care & Housing Sector Overview</div><div class="module-meta">Tue 8 Jul · Self-learn pp.9–16 · ~1 hour</div></div>
+            <span class="module-type type-self">SELF-LEARN</span><span class="expand-icon">▶</span>
+          </div>
+          <div class="module-body"><div class="module-body-inner">
+            <div class="body-section">
+              <h4>📌 What to learn</h4>
+              <ul>
+                <li><strong>Residential care:</strong> 24-hour care in a care home. Residents live on-site. Staffing needs are constant — shifts cover day, night and weekends. Workers need experience with personal care.</li>
+                <li><strong>Domiciliary care:</strong> Care delivered in the service user's own home. Workers travel between clients throughout the day. Also called "home care." Very high volume of vacancies in this area.</li>
+                <li><strong>Supported living:</strong> Individuals live in their own tenancy (often shared) with staff support available. Workers support independence — not the same as full personal care. Increasingly common for LD and mental health service users.</li>
+                <li><strong>Housing sector:</strong> Housing associations manage affordable/social housing. They need support workers, floating support staff, and housing officers. The work overlaps significantly with social care.</li>
+                <li><strong>Sector challenges:</strong> Chronic staff shortages, high turnover, CQC regulation, and IR35 changes for contractors. Clients need to fill roles quickly and reliably — your speed and accuracy as a Resourcer directly supports this.</li>
+              </ul>
+            </div>
+            <div class="body-section">
+              <h4>🔑 Key Terms</h4>
+              <div class="term-grid">
+                <div class="term-card"><div class="term">Service user</div><div class="def">The person receiving care. Never call them "patient" or "client" in a care context.</div></div>
+                <div class="term-card"><div class="term">Domiciliary care</div><div class="def">Care delivered in someone's own home</div></div>
+                <div class="term-card"><div class="term">Supported living</div><div class="def">Care model where the person lives independently with on-site or visiting staff support</div></div>
+                <div class="term-card"><div class="term">Housing association</div><div class="def">Non-profit organisation that provides affordable/social housing</div></div>
+                <div class="term-card"><div class="term">Floating support</div><div class="def">Non-care support (budgeting, tenancy) for people in their own home</div></div>
+                <div class="term-card"><div class="term">CQC</div><div class="def">Regulator that inspects and rates care providers. A poor rating = urgent need to hire.</div></div>
+              </div>
+            </div>
+            <div class="quiz-section">
+              <h4>🧠 Knowledge Check</h4>
+              <div class="quiz-q" id="qw1-3-1">
+                <p>What is domiciliary care?</p>
+                <button class="quiz-opt" onclick="answerQ(this,false,'qw1-3-1')">Care provided in a residential care home setting</button>
+                <button class="quiz-opt" onclick="answerQ(this,true,'qw1-3-1')">Care delivered in the service user's own home</button>
+                <button class="quiz-opt" onclick="answerQ(this,false,'qw1-3-1')">Care for people with learning disabilities only</button>
+              </div>
+              <div class="quiz-q" id="qw1-3-2">
+                <p>What is the key difference between supported living and residential care?</p>
+                <button class="quiz-opt" onclick="answerQ(this,false,'qw1-3-2')">Supported living is more expensive</button>
+                <button class="quiz-opt" onclick="answerQ(this,true,'qw1-3-2')">In supported living, the person has their own tenancy and staff support independence — in residential care, people live in a care home with 24-hour staff</button>
+                <button class="quiz-opt" onclick="answerQ(this,false,'qw1-3-2')">There is no meaningful difference</button>
+              </div>
+            </div>
+            <div class="status-controls">
+              <button class="status-btn start" onclick="setStatus('mod-w1-3','in-progress')">▶ In Progress</button>
+              <button class="status-btn complete" onclick="setStatus('mod-w1-3','done')">✓ Complete</button>
+              <button class="status-btn reset" onclick="setStatus('mod-w1-3','todo')">↺ Reset</button>
+            </div>
+          </div></div>
+        </div>
+
+        <!-- W1 M4: Legislation -->
+        <div class="module" id="mod-w1-4">
+          <div class="module-header" onclick="toggleModule('mod-w1-4')">
+            <div class="module-check" id="check-mod-w1-4"></div>
+            <div class="module-emoji">⚖️</div>
+            <div class="module-info"><div class="module-title">Legislation & Compliance in Social Care Recruitment</div><div class="module-meta">Tue–Wed 8–9 Jul · Self-learn pp.17–22 + trainer walkthrough · ~1.5 hours</div></div>
+            <span class="module-type type-trained">TRAINED</span><span class="expand-icon">▶</span>
+          </div>
+          <div class="module-body"><div class="module-body-inner">
+            <div class="body-section">
+              <h4>📌 What to learn</h4>
+              <ul>
+                <li><strong>Right to Work (RTW):</strong> You must verify every candidate's right to work in the UK before they start. Accepted documents: passport, biometric residence permit, share code. If in doubt — stop, escalate to your Delivery Consultant.</li>
+                <li><strong>DBS Checks:</strong> Disclosure and Barring Service checks screen for criminal records. Basic = any role. Standard = some regulated roles. Enhanced = working with vulnerable adults or children. Enhanced with barred lists = mandatory for direct care work in social care.</li>
+                <li><strong>GDPR in recruitment:</strong> You can only store candidate data you have a lawful basis to hold. Candidates must consent to you sharing their CV with clients. You cannot forward a CV without permission. Data must be kept accurate and deleted when no longer needed.</li>
+                <li><strong>Employment Agency Standards (EAS):</strong> As a recruitment agency we must not charge candidates fees, must provide key information documents, and must keep accurate records. Your manager will brief you on these obligations.</li>
+                <li><strong>IR35:</strong> Relevant for contract (limited company) placements. Determines whether a contractor should be taxed as an employee. For now, flag any contract roles to your Delivery Consultant — don't navigate IR35 alone.</li>
+              </ul>
+            </div>
+            <div class="tip-box"><strong>⚠️ Compliance is non-negotiable.</strong> Never submit a candidate to a client without first confirming their RTW and DBS status in the CRM. Even if the client is chasing you urgently — if compliance isn't complete, the answer is no.</div>
+            <div class="body-section">
+              <h4>🔑 Key Terms</h4>
+              <div class="term-grid">
+                <div class="term-card"><div class="term">RTW</div><div class="def">Right to Work — legal check confirming candidate can work in the UK</div></div>
+                <div class="term-card"><div class="term">Enhanced DBS</div><div class="def">Highest level of DBS check — required for all direct care/support work</div></div>
+                <div class="term-card"><div class="term">Barred lists</div><div class="def">DBS lists of people barred from working with children or vulnerable adults</div></div>
+                <div class="term-card"><div class="term">GDPR</div><div class="def">General Data Protection Regulation — governs how candidate data is stored and used</div></div>
+                <div class="term-card"><div class="term">Lawful basis</div><div class="def">Legal justification for processing personal data (e.g. consent, legitimate interest)</div></div>
+                <div class="term-card"><div class="term">IR35</div><div class="def">Tax legislation affecting contractors — determines employment status for tax purposes</div></div>
+              </div>
+            </div>
+            <div class="quiz-section">
+              <h4>🧠 Knowledge Check</h4>
+              <div class="quiz-q" id="qw1-4-1">
+                <p>Which DBS level is required for someone working directly with vulnerable adults in social care?</p>
+                <button class="quiz-opt" onclick="answerQ(this,false,'qw1-4-1')">Basic DBS</button>
+                <button class="quiz-opt" onclick="answerQ(this,false,'qw1-4-1')">Standard DBS</button>
+                <button class="quiz-opt" onclick="answerQ(this,true,'qw1-4-1')">Enhanced DBS with barred lists check</button>
+              </div>
+              <div class="quiz-q" id="qw1-4-2">
+                <p>Can you forward a candidate's CV to a client without their knowledge?</p>
+                <button class="quiz-opt" onclick="answerQ(this,false,'qw1-4-2')">Yes, if the role is a good match</button>
+                <button class="quiz-opt" onclick="answerQ(this,true,'qw1-4-2')">No — under GDPR, candidates must consent to their CV being shared</button>
+                <button class="quiz-opt" onclick="answerQ(this,false,'qw1-4-2')">Yes, if the Delivery Consultant approves it</button>
+              </div>
+              <div class="quiz-q" id="qw1-4-3">
+                <p>A client is chasing you urgently to fill a shift tonight. The candidate's DBS hasn't come back yet. What do you do?</p>
+                <button class="quiz-opt" onclick="answerQ(this,false,'qw1-4-3')">Submit the candidate anyway — the client needs them tonight</button>
+                <button class="quiz-opt" onclick="answerQ(this,false,'qw1-4-3')">Ask the candidate to self-declare they have no criminal record</button>
+                <button class="quiz-opt" onclick="answerQ(this,true,'qw1-4-3')">Escalate to your Delivery Consultant — you cannot submit without compliance in place</button>
+              </div>
+            </div>
+            <div class="status-controls">
+              <button class="status-btn start" onclick="setStatus('mod-w1-4','in-progress')">▶ In Progress</button>
+              <button class="status-btn complete" onclick="setStatus('mod-w1-4','done')">✓ Complete</button>
+              <button class="status-btn reset" onclick="setStatus('mod-w1-4','todo')">↺ Reset</button>
+            </div>
+          </div></div>
+        </div>
+
+        <!-- W1 M5: Job Titles -->
+        <div class="module" id="mod-w1-5">
+          <div class="module-header" onclick="toggleModule('mod-w1-5')">
+            <div class="module-check" id="check-mod-w1-5"></div>
+            <div class="module-emoji">📋</div>
+            <div class="module-info"><div class="module-title">Job Titles & Types of Service in SCH</div><div class="module-meta">Wed 9 Jul · Self-learn pp.23–27 · ~45 mins</div></div>
+            <span class="module-type type-self">SELF-LEARN</span><span class="expand-icon">▶</span>
+          </div>
+          <div class="module-body"><div class="module-body-inner">
+            <div class="body-section">
+              <h4>📌 What to learn</h4>
+              <ul>
+                <li><strong>Support Worker:</strong> Entry-level direct care role. Requires compassion, basic personal care skills and ideally an NVQ Level 2 in Health & Social Care (or willingness to work towards it). This is our highest volume vacancy type.</li>
+                <li><strong>Senior Support Worker:</strong> More experienced, often responsible for a small team on shift. May have NVQ Level 3. Can deputise for the Team Leader.</li>
+                <li><strong>Team Leader / Shift Leader:</strong> Supervises support workers during a shift. Responsible for quality of care, incident reporting, and handovers. Usually NVQ Level 3 minimum.</li>
+                <li><strong>Service Manager / Registered Manager:</strong> Runs the whole service. Responsible to CQC. Requires Level 5 Diploma in Leadership for Health & Social Care. These are senior hires — handled primarily by Delivery Consultants but you may source them.</li>
+                <li><strong>Types of service:</strong> Mental health supported living, learning disability residential, physical disability domiciliary, autism-specific services, dementia care, elderly residential. Different services need different skills — always check the vacancy spec carefully.</li>
+              </ul>
+            </div>
+            <div class="tip-box"><strong>💡 Quick reference:</strong> When a client says "we need a Support Worker for our LD supported living service," you know: LD = Learning Disability, the role is entry-level, it's a supported living (not residential) environment, and the candidate needs experience with people who have learning disabilities.</div>
+            <div class="body-section">
+              <h4>🔑 Key Terms</h4>
+              <div class="term-grid">
+                <div class="term-card"><div class="term">NVQ Level 2</div><div class="def">Entry-level care qualification — often required for Support Worker roles</div></div>
+                <div class="term-card"><div class="term">NVQ Level 3</div><div class="def">Intermediate care qualification — typically needed for Senior/Team Leader roles</div></div>
+                <div class="term-card"><div class="term">Level 5 Diploma</div><div class="def">Management-level qualification required for Registered Manager roles</div></div>
+                <div class="term-card"><div class="term">LD</div><div class="def">Learning Disability — shorthand used widely in sector job specs</div></div>
+                <div class="term-card"><div class="term">MH</div><div class="def">Mental Health — another common abbreviation in job specs and vacancy briefs</div></div>
+                <div class="term-card"><div class="term">Registered Manager</div><div class="def">Person legally responsible for the registered care service with CQC</div></div>
+              </div>
+            </div>
+            <div class="quiz-section">
+              <h4>🧠 Knowledge Check</h4>
+              <div class="quiz-q" id="qw1-5-1">
+                <p>A client needs a Registered Manager for their LD residential service. What qualification would a strong candidate typically hold?</p>
+                <button class="quiz-opt" onclick="answerQ(this,false,'qw1-5-1')">NVQ Level 2 in Health & Social Care</button>
+                <button class="quiz-opt" onclick="answerQ(this,false,'qw1-5-1')">A degree in Social Work</button>
+                <button class="quiz-opt" onclick="answerQ(this,true,'qw1-5-1')">Level 5 Diploma in Leadership for Health & Social Care</button>
+              </div>
+              <div class="quiz-q" id="qw1-5-2">
+                <p>What does "LD supported living" mean on a vacancy spec?</p>
+                <button class="quiz-opt" onclick="answerQ(this,false,'qw1-5-2')">A learning difficulties residential care home</button>
+                <button class="quiz-opt" onclick="answerQ(this,true,'qw1-5-2')">A supported living service for people with learning disabilities, where residents live in their own tenancy with staff support</button>
+                <button class="quiz-opt" onclick="answerQ(this,false,'qw1-5-2')">A low-dependency service for the elderly</button>
+              </div>
+            </div>
+            <div class="status-controls">
+              <button class="status-btn start" onclick="setStatus('mod-w1-5','in-progress')">▶ In Progress</button>
+              <button class="status-btn complete" onclick="setStatus('mod-w1-5','done')">✓ Complete</button>
+              <button class="status-btn reset" onclick="setStatus('mod-w1-5','todo')">↺ Reset</button>
+            </div>
+          </div></div>
+        </div>
+
+        <!-- W1 M6: Learning Disabilities -->
+        <div class="module" id="mod-w1-6">
+          <div class="module-header" onclick="toggleModule('mod-w1-6')">
+            <div class="module-check" id="check-mod-w1-6"></div>
+            <div class="module-emoji">📖</div>
+            <div class="module-info"><div class="module-title">Learning Disabilities, Autism & Related Conditions</div><div class="module-meta">Thu 10 Jul · Self-learn pp.28–32 · ~1 hour</div></div>
+            <span class="module-type type-self">SELF-LEARN</span><span class="expand-icon">▶</span>
+          </div>
+          <div class="module-body"><div class="module-body-inner">
+            <div class="body-section">
+              <h4>📌 What to learn</h4>
+              <ul>
+                <li><strong>Learning disability vs learning difficulty:</strong> A learning disability (e.g. Down's Syndrome) affects intellectual ability and adaptive behaviour. A learning difficulty (e.g. dyslexia) affects specific skills but not overall intelligence. These are different things — don't use them interchangeably with candidates or clients.</li>
+                <li><strong>Autism Spectrum Condition (ASC/ASD):</strong> A neurodevelopmental condition affecting social communication and interaction. It can co-exist with a learning disability but is not itself a learning disability. Many people with autism are highly able. Workers need patience, routine, and clear communication.</li>
+                <li><strong>Down's Syndrome:</strong> A genetic condition causing some level of learning disability. Candidates working in this area need experience with personal care, communication support and positive behaviour support.</li>
+                <li><strong>ADHD and mental health:</strong> Many social care services support people with co-existing conditions — mental health, ADHD, trauma. Workers need trauma-informed approaches and patience.</li>
+                <li><strong>Language matters:</strong> Say "person with a learning disability" not "learning disabled person." Say "autistic person" or "person with autism" (check individual preference). Never use outdated or offensive terms — this reflects on Winlight.</li>
+              </ul>
+            </div>
+            <div class="tip-box"><strong>💡 Why this matters for sourcing:</strong> When screening candidates for LD or autism-specific roles, ask specifically about their experience: "Can you tell me about a time you supported someone with autism?" — vague answers are a red flag. Experienced candidates will give detailed, person-centred responses.</div>
+            <div class="quiz-section">
+              <h4>🧠 Knowledge Check</h4>
+              <div class="quiz-q" id="qw1-6-1">
+                <p>Is autism a learning disability?</p>
+                <button class="quiz-opt" onclick="answerQ(this,false,'qw1-6-1')">Yes, autism is always classified as a learning disability</button>
+                <button class="quiz-opt" onclick="answerQ(this,true,'qw1-6-1')">Not always — autism is a neurodevelopmental condition that can co-exist with a learning disability but is not automatically one</button>
+                <button class="quiz-opt" onclick="answerQ(this,false,'qw1-6-1')">No, autism and learning disability are completely unrelated conditions</button>
+              </div>
+              <div class="quiz-q" id="qw1-6-2">
+                <p>Which of the following is the most appropriate way to refer to someone in conversation with a client?</p>
+                <button class="quiz-opt" onclick="answerQ(this,false,'qw1-6-2')">A learning disabled person</button>
+                <button class="quiz-opt" onclick="answerQ(this,false,'qw1-6-2')">A special needs individual</button>
+                <button class="quiz-opt" onclick="answerQ(this,true,'qw1-6-2')">A person with a learning disability</button>
+              </div>
+            </div>
+            <div class="status-controls">
+              <button class="status-btn start" onclick="setStatus('mod-w1-6','in-progress')">▶ In Progress</button>
+              <button class="status-btn complete" onclick="setStatus('mod-w1-6','done')">✓ Complete</button>
+              <button class="status-btn reset" onclick="setStatus('mod-w1-6','todo')">↺ Reset</button>
+            </div>
+          </div></div>
+        </div>
+
+        <!-- W1 M7: End of Week 1 -->
+        <div class="module" id="mod-w1-7">
+          <div class="module-header" onclick="toggleModule('mod-w1-7')">
+            <div class="module-check" id="check-mod-w1-7"></div>
+            <div class="module-emoji">✅</div>
+            <div class="module-info"><div class="module-title">End of Week 1 Recap & Consolidation</div><div class="module-meta">Fri 11 Jul · With your trainer · ~1 hour</div></div>
+            <span class="module-type type-checkin">CHECK-IN</span><span class="expand-icon">▶</span>
+          </div>
+          <div class="module-body"><div class="module-body-inner">
+            <div class="body-section">
+              <h4>📌 How to prepare</h4>
+              <ul>
+                <li>Review all modules from this week — note anything you're unsure about and bring specific questions.</li>
+                <li>Be ready to explain (in plain English) the difference between three types of social care service.</li>
+                <li>Be ready to explain why an Enhanced DBS with barred lists is required in this sector.</li>
+                <li>Share your first impressions of the team, the sector, and what you're most looking forward to in Week 2.</li>
+                <li>Trainer will give you informal verbal feedback on how the week has gone.</li>
+              </ul>
+            </div>
+            <div class="tip-box"><strong>💡 Reflection prompt:</strong> What's one thing from this week that surprised you about the social care sector? Being curious and engaged will stand out to your managers from day one.</div>
+            <div class="status-controls">
+              <button class="status-btn start" onclick="setStatus('mod-w1-7','in-progress')">▶ In Progress</button>
+              <button class="status-btn complete" onclick="setStatus('mod-w1-7','done')">✓ Complete</button>
+              <button class="status-btn reset" onclick="setStatus('mod-w1-7','todo')">↺ Reset</button>
+            </div>
+          </div></div>
+        </div>
+
+      </div>
+    </div><!-- end week 1 -->
+
+    <!-- ═══════════════════ WEEK 2 ═══════════════════ -->
+    <div class="week-panel" id="week-2">
+      <div class="week-header">
+        <div><h2>Week 2 — Systems, Sourcing & Live Calls</h2><div class="week-dates">14–18 July 2026</div></div>
+        <div class="week-badge" id="badge-2">0%</div>
+      </div>
+      <div class="week-body">
+
+        <!-- W2 M1: Resourcer Role -->
+        <div class="module" id="mod-w2-1">
+          <div class="module-header" onclick="toggleModule('mod-w2-1')">
+            <div class="module-check" id="check-mod-w2-1"></div>
+            <div class="module-emoji">🎯</div>
+            <div class="module-info"><div class="module-title">The Resourcer Role: Responsibilities & KPIs</div><div class="module-meta">Mon 14 Jul · Trainer-led · ~1.5 hours</div></div>
+            <span class="module-type type-trained">TRAINED</span><span class="expand-icon">▶</span>
+          </div>
+          <div class="module-body"><div class="module-body-inner">
+            <div class="body-section">
+              <h4>📌 What to learn</h4>
+              <ul>
+                <li><strong>The candidate lifecycle:</strong> Sourcing → Screening call → CV preparation → Submission to client → Interview arranged → Offer → Compliance → Start. You own every step from sourcing through to submission. The Delivery Consultant takes it from there.</li>
+                <li><strong>Your KPIs:</strong> You will be measured on daily call volume, new candidates registered per week, CVs submitted, interview conversion rate, and — eventually — placements. These are your targets. Track them daily.</li>
+                <li><strong>Prioritising vacancies:</strong> Not all vacancies are equal. A temp shift starting tomorrow is more urgent than a perm role with a 4-week notice period. Your Delivery Consultant will brief you on priority order each morning — ask if you're unsure.</li>
+                <li><strong>Time ownership:</strong> A good Resourcer plans their day the night before. First 30 mins = admin and callbacks. Core hours = sourcing and calling. End of day = CRM updates and tomorrow's prep.</li>
+                <li><strong>Communication with the DC:</strong> Brief your Delivery Consultant on interesting candidates proactively — don't wait to be asked. "I've spoken to someone who could be great for X — want me to write them up?" is music to a DC's ears.</li>
+              </ul>
+            </div>
+            <div class="body-section">
+              <h4>🔑 Key Terms</h4>
+              <div class="term-grid">
+                <div class="term-card"><div class="term">DC</div><div class="def">Delivery Consultant — your senior recruiter counterpart who owns the client</div></div>
+                <div class="term-card"><div class="term">Pipeline</div><div class="def">Your pool of active candidates at various stages of the process</div></div>
+                <div class="term-card"><div class="term">Submission</div><div class="def">Sending a candidate's CV to a client for a specific vacancy</div></div>
+                <div class="term-card"><div class="term">Conversion rate</div><div class="def">% of submissions that result in an interview; then % of interviews that result in a placement</div></div>
+                <div class="term-card"><div class="term">Notice period</div><div class="def">How long a candidate needs to give their current employer before starting a new role</div></div>
+                <div class="term-card"><div class="term">Live vacancy</div><div class="def">An active, open role a client is currently trying to fill</div></div>
+              </div>
+            </div>
+            <div class="quiz-section">
+              <h4>🧠 Knowledge Check</h4>
+              <div class="quiz-q" id="qw2-1-1">
+                <p>At which point does your responsibility as a Resourcer typically end in the candidate lifecycle?</p>
+                <button class="quiz-opt" onclick="answerQ(this,false,'qw2-1-1')">When the candidate accepts the job offer</button>
+                <button class="quiz-opt" onclick="answerQ(this,true,'qw2-1-1')">When the CV has been submitted to the client — the DC then manages interviews and offer stage</button>
+                <button class="quiz-opt" onclick="answerQ(this,false,'qw2-1-1')">When the candidate starts in the role</button>
+              </div>
+            </div>
+            <div class="status-controls">
+              <button class="status-btn start" onclick="setStatus('mod-w2-1','in-progress')">▶ In Progress</button>
+              <button class="status-btn complete" onclick="setStatus('mod-w2-1','done')">✓ Complete</button>
+              <button class="status-btn reset" onclick="setStatus('mod-w2-1','todo')">↺ Reset</button>
+            </div>
+          </div></div>
+        </div>
+
+        <!-- W2 M2: CRM & Job Boards -->
+        <div class="module" id="mod-w2-2">
+          <div class="module-header" onclick="toggleModule('mod-w2-2')">
+            <div class="module-check" id="check-mod-w2-2"></div>
+            <div class="module-emoji">🖥️</div>
+            <div class="module-info"><div class="module-title">CRM System & Job Board Sourcing</div><div class="module-meta">Mon–Tue 14–15 Jul · Trainer-led · ~3 hours</div></div>
+            <span class="module-type type-trained">TRAINED</span><span class="expand-icon">▶</span>
+          </div>
+          <div class="module-body"><div class="module-body-inner">
+            <div class="body-section">
+              <h4>📌 What to learn</h4>
+              <ul>
+                <li><strong>CRM navigation:</strong> How to search the existing candidate database — always check here first before going to job boards. You may already have the right person. Log every call, every note, every status change.</li>
+                <li><strong>Adding candidates:</strong> Full name, contact details, current role, availability, DBS status, RTW status. Incomplete records are useless. Quality over speed.</li>
+                <li><strong>Job boards — CV Library, Reed, Indeed:</strong> Each has different strengths. CV Library is strong for care sector candidates. Reed has good coverage. Indeed has high volume but more noise. Your trainer will show you the accounts.</li>
+                <li><strong>Boolean search:</strong> The most powerful sourcing tool. Use AND to narrow results, OR to broaden, NOT to exclude. Brackets group terms. Example: <em>("support worker" OR "care worker") AND ("learning disability" OR "LD") AND London NOT manager</em></li>
+                <li><strong>Compliance in the CRM:</strong> Every candidate profile must show RTW checked, DBS type and status before a submission is logged. This protects Winlight legally — it's not optional.</li>
+              </ul>
+            </div>
+            <div class="tip-box"><strong>💡 Boolean tip:</strong> Put exact job titles in speech marks. "Support worker" (with quotes) finds that exact phrase. Without quotes, the search engine may return anything containing "support" or "worker" separately — far too broad.</div>
+            <div class="quiz-section">
+              <h4>🧠 Knowledge Check</h4>
+              <div class="quiz-q" id="qw2-2-1">
+                <p>What does the Boolean operator AND do in a job board search?</p>
+                <button class="quiz-opt" onclick="answerQ(this,false,'qw2-2-1')">Broadens the search to include either term</button>
+                <button class="quiz-opt" onclick="answerQ(this,true,'qw2-2-1')">Narrows results — both terms must appear in the CV</button>
+                <button class="quiz-opt" onclick="answerQ(this,false,'qw2-2-1')">Excludes the second term from results</button>
+              </div>
+              <div class="quiz-q" id="qw2-2-2">
+                <p>Before sourcing externally on job boards, what should you always do first?</p>
+                <button class="quiz-opt" onclick="answerQ(this,true,'qw2-2-2')">Search the existing CRM database — you may already have a suitable candidate</button>
+                <button class="quiz-opt" onclick="answerQ(this,false,'qw2-2-2')">Post a new job advert on Indeed</button>
+                <button class="quiz-opt" onclick="answerQ(this,false,'qw2-2-2')">Ask the client if they have any referrals</button>
+              </div>
+            </div>
+            <div class="status-controls">
+              <button class="status-btn start" onclick="setStatus('mod-w2-2','in-progress')">▶ In Progress</button>
+              <button class="status-btn complete" onclick="setStatus('mod-w2-2','done')">✓ Complete</button>
+              <button class="status-btn reset" onclick="setStatus('mod-w2-2','todo')">↺ Reset</button>
+            </div>
+          </div></div>
+        </div>
+
+        <!-- W2 M3: Shadow Calls -->
+        <div class="module" id="mod-w2-3">
+          <div class="module-header" onclick="toggleModule('mod-w2-3')">
+            <div class="module-check" id="check-mod-w2-3"></div>
+            <div class="module-emoji">📞</div>
+            <div class="module-info"><div class="module-title">Shadow Live Candidate Calls</div><div class="module-meta">Wed 16 Jul · Shadow your trainer · Half day</div></div>
+            <span class="module-type type-trained">TRAINED</span><span class="expand-icon">▶</span>
+          </div>
+          <div class="module-body"><div class="module-body-inner">
+            <div class="body-section">
+              <h4>📌 What to observe and note down</h4>
+              <ul>
+                <li><strong>Opening the call:</strong> How does the trainer introduce themselves and Winlight? Note the tone — warm, confident, not scripted. How quickly do they get to the point?</li>
+                <li><strong>Qualifying questions:</strong> Listen for the key questions: What are you looking for? What's your current situation? What's your availability? What type of service do you prefer? What's your DBS status?</li>
+                <li><strong>Handling "I'm not looking":</strong> Note how the trainer doesn't argue — they ask curiosity questions: "What would need to change for you to consider a move?" Soft, not pushy.</li>
+                <li><strong>Selling the role/Winlight:</strong> How do they position us? What do they say about the client, the role, the opportunity? Note the language.</li>
+                <li><strong>Closing the call:</strong> Every call should end with a clear next step. "I'll send you the JD, take a look, and I'll call you Thursday — does that work?" No vague endings.</li>
+                <li><strong>CRM logging:</strong> Watch how notes are entered during/immediately after the call. This is how nothing falls through the cracks.</li>
+              </ul>
+            </div>
+            <div class="tip-box"><strong>💡 Active shadowing:</strong> After each call, ask your trainer: "What were you thinking when they said X?" Understanding the reasoning behind responses is as important as the words themselves.</div>
+            <div class="status-controls">
+              <button class="status-btn start" onclick="setStatus('mod-w2-3','in-progress')">▶ In Progress</button>
+              <button class="status-btn complete" onclick="setStatus('mod-w2-3','done')">✓ Complete</button>
+              <button class="status-btn reset" onclick="setStatus('mod-w2-3','todo')">↺ Reset</button>
+            </div>
+          </div></div>
+        </div>
+
+        <!-- W2 M4: Org Skills -->
+        <div class="module" id="mod-w2-4">
+          <div class="module-header" onclick="toggleModule('mod-w2-4')">
+            <div class="module-check" id="check-mod-w2-4"></div>
+            <div class="module-emoji">🗂️</div>
+            <div class="module-info"><div class="module-title">Organisational Skills & Time Management</div><div class="module-meta">Thu 17 Jul · Trainer-led · ~1 hour</div></div>
+            <span class="module-type type-trained">TRAINED</span><span class="expand-icon">▶</span>
+          </div>
+          <div class="module-body"><div class="module-body-inner">
+            <div class="body-section">
+              <h4>📌 What to learn</h4>
+              <ul>
+                <li><strong>The Urgent/Important Matrix:</strong> Quadrant 1 = Urgent & Important (do now). Quadrant 2 = Important, not urgent (schedule it). Quadrant 3 = Urgent, not important (delegate or batch). Quadrant 4 = Neither (eliminate). Most Resourcers spend too much time in Q3 — be disciplined.</li>
+                <li><strong>Managing multiple vacancies:</strong> Create a simple daily priority list. Which vacancy has the hardest deadline? Which client is most important to the DC? Focus your best calling hours on those first.</li>
+                <li><strong>Your daily rhythm:</strong> Morning — review your call-back list and reply to any overnight emails. Mid-morning to 1pm — peak calling time (candidates are reachable). Afternoon — sourcing, CRM admin, writing CVs. End of day — update CRM and prep tomorrow's list.</li>
+                <li><strong>Outlook Calendar:</strong> Block time for calls. Set reminders for candidate callbacks. Use recurring blocks for daily CRM updates. Share your calendar with your DC so they know when you're in a meeting.</li>
+                <li><strong>OneNote:</strong> Keep a running note per vacancy. Capture names, numbers, call notes and any context the DC has given you. This is your personal working file — keep it tidy.</li>
+              </ul>
+            </div>
+            <div class="tip-box"><strong>💡 Peak calling hours:</strong> 8–9am and 5–6.30pm are when candidates are most reachable (before and after work). Block these in your calendar as sacred sourcing time. Mid-afternoon is best for admin.</div>
+            <div class="status-controls">
+              <button class="status-btn start" onclick="setStatus('mod-w2-4','in-progress')">▶ In Progress</button>
+              <button class="status-btn complete" onclick="setStatus('mod-w2-4','done')">✓ Complete</button>
+              <button class="status-btn reset" onclick="setStatus('mod-w2-4','todo')">↺ Reset</button>
+            </div>
+          </div></div>
+        </div>
+
+        <!-- W2 M5: Tools Setup -->
+        <div class="module" id="mod-w2-5">
+          <div class="module-header" onclick="toggleModule('mod-w2-5')">
+            <div class="module-check" id="check-mod-w2-5"></div>
+            <div class="module-emoji">⚙️</div>
+            <div class="module-info"><div class="module-title">Tools Setup: Outlook, OneNote & Shared Trackers</div><div class="module-meta">Thu 17 Jul · Trainer-led · ~1 hour</div></div>
+            <span class="module-type type-trained">TRAINED</span><span class="expand-icon">▶</span>
+          </div>
+          <div class="module-body"><div class="module-body-inner">
+            <div class="body-section">
+              <h4>📌 What to set up</h4>
+              <ul>
+                <li><strong>Outlook Calendar:</strong> Set your working hours, add recurring weekly planning blocks, and share your calendar with Jess and Kaz. Set a daily 8am reminder titled "Check callbacks."</li>
+                <li><strong>Outlook email:</strong> Set up folders: Active Vacancies, Candidate Submissions, Compliance, Admin. Move emails immediately — don't leave everything in your inbox. Set your email signature (your trainer will share the Winlight template).</li>
+                <li><strong>OneNote:</strong> Create a section for each active vacancy. Inside each: client name, DC name, vacancy brief, notes from calls, candidate shortlist. This is your working brain — treat it seriously.</li>
+                <li><strong>Shared team trackers:</strong> Your team uses shared spreadsheets/trackers for vacancy status, KPIs and compliance. Your trainer will walk you through which ones, where they live, and how to update them. Always update same-day.</li>
+                <li><strong>Microsoft Teams:</strong> Know which channels to watch. There will be a general team channel and likely a channel per vacancy or client type. Set notifications for channels relevant to you; mute the rest.</li>
+              </ul>
+            </div>
+            <div class="status-controls">
+              <button class="status-btn start" onclick="setStatus('mod-w2-5','in-progress')">▶ In Progress</button>
+              <button class="status-btn complete" onclick="setStatus('mod-w2-5','done')">✓ Complete</button>
+              <button class="status-btn reset" onclick="setStatus('mod-w2-5','todo')">↺ Reset</button>
+            </div>
+          </div></div>
+        </div>
+
+        <!-- W2 M6: WhatsApp Business -->
+        <div class="module" id="mod-w2-6">
+          <div class="module-header" onclick="toggleModule('mod-w2-6')">
+            <div class="module-check" id="check-mod-w2-6"></div>
+            <div class="module-emoji">💬</div>
+            <div class="module-info"><div class="module-title">WhatsApp Business — Candidate Follow-Up</div><div class="module-meta">Fri 18 Jul · Trainer-led · ~45 mins</div></div>
+            <span class="module-type type-trained">TRAINED</span><span class="expand-icon">▶</span>
+          </div>
+          <div class="module-body"><div class="module-body-inner">
+            <div class="body-section">
+              <h4>📌 What to learn</h4>
+              <ul>
+                <li><strong>Why WhatsApp Business:</strong> Many care sector candidates don't answer calls from unknown numbers but will respond to a WhatsApp. Response rates are significantly higher than phone or email for initial contact.</li>
+                <li><strong>Setup:</strong> Use the Winlight business WhatsApp account (your trainer will set you up). Never use your personal WhatsApp number for candidate contact — this creates GDPR and handover issues.</li>
+                <li><strong>Quick replies:</strong> Set up quick replies for your most common messages (initial outreach, availability check, interview confirmation). Saves huge amounts of time at scale.</li>
+                <li><strong>The 3-touch follow-up:</strong> Touch 1 = WhatsApp message + call attempt. Touch 2 (24 hours later) = follow-up WhatsApp. Touch 3 (48 hours after Touch 2) = final message stating you'll close the file. After 3 touches with no response, move on and log it in the CRM.</li>
+                <li><strong>GDPR:</strong> You can only message candidates who have given consent (e.g. by applying, registering, or giving permission). Don't cold-message people who haven't engaged with you. When a candidate asks to be removed — do it immediately and log it.</li>
+              </ul>
+            </div>
+            <div class="tip-box"><strong>💡 3-touch example:</strong><br>Touch 1: "Hi [Name], I'm Chhavi from Winlight Recruitment — I came across your profile and think I may have a great opportunity for you in [area]. Are you open to hearing more? 😊"<br>Touch 2 (24hrs): "Hi again — just following up on my message yesterday. Happy to jump on a quick call at a time that suits you?"<br>Touch 3 (48hrs later): "Hi [Name] — I'll leave it here for now, but please do get in touch if you're ever open to new roles. Best wishes."</div>
+            <div class="status-controls">
+              <button class="status-btn start" onclick="setStatus('mod-w2-6','in-progress')">▶ In Progress</button>
+              <button class="status-btn complete" onclick="setStatus('mod-w2-6','done')">✓ Complete</button>
+              <button class="status-btn reset" onclick="setStatus('mod-w2-6','todo')">↺ Reset</button>
+            </div>
+          </div></div>
+        </div>
+
+      </div>
+    </div><!-- end week 2 -->
+
+    <!-- ═══════════════════ WEEK 3 ═══════════════════ -->
+    <div class="week-panel" id="week-3">
+      <div class="week-header">
+        <div><h2>Week 3 — Live Coaching & Role Play</h2><div class="week-dates">21–25 July 2026</div></div>
+        <div class="week-badge" id="badge-3">0%</div>
+      </div>
+      <div class="week-body">
+
+        <div class="module" id="mod-w3-1">
+          <div class="module-header" onclick="toggleModule('mod-w3-1')">
+            <div class="module-check" id="check-mod-w3-1"></div>
+            <div class="module-emoji">📞</div>
+            <div class="module-info"><div class="module-title">First Live Candidate Calls (Coached)</div><div class="module-meta">Mon–Tue 21–22 Jul · Trainer listens in · Full days</div></div>
+            <span class="module-type type-trained">TRAINED</span><span class="expand-icon">▶</span>
+          </div>
+          <div class="module-body"><div class="module-body-inner">
+            <div class="body-section">
+              <h4>📌 How this works</h4>
+              <ul>
+                <li>You make the calls — your trainer listens in silently and takes notes. They will not step in unless absolutely necessary.</li>
+                <li>Use a printed or on-screen screening checklist for every call: availability, location, experience, DBS, RTW, notice period, salary expectations.</li>
+                <li>After each call, take 2 minutes to log notes in the CRM before the next one — don't batch them.</li>
+                <li>After every 3–4 calls, do a quick debrief with your trainer: what went well, one thing to adjust on the next call.</li>
+                <li>Aim for a minimum of 15 calls on each day. Quality first, but call volume matters — you need to build your muscle memory.</li>
+              </ul>
+            </div>
+            <div class="tip-box"><strong>💡 It's OK to be nervous.</strong> Every recruiter has a shaky first call. Don't over-script — candidates can hear it. Be yourself, be curious, and focus on listening. The script becomes natural within days.</div>
+            <div class="status-controls">
+              <button class="status-btn start" onclick="setStatus('mod-w3-1','in-progress')">▶ In Progress</button>
+              <button class="status-btn complete" onclick="setStatus('mod-w3-1','done')">✓ Complete</button>
+              <button class="status-btn reset" onclick="setStatus('mod-w3-1','todo')">↺ Reset</button>
+            </div>
+          </div></div>
+        </div>
+
+        <div class="module" id="mod-w3-2">
+          <div class="module-header" onclick="toggleModule('mod-w3-2')">
+            <div class="module-check" id="check-mod-w3-2"></div>
+            <div class="module-emoji">🎭</div>
+            <div class="module-info"><div class="module-title">Role Play: Handling Objections & Unresponsive Candidates</div><div class="module-meta">Wed 23 Jul · Role play activity · ~2 hours</div></div>
+            <span class="module-type type-roleplay">ROLE PLAY</span><span class="expand-icon">▶</span>
+          </div>
+          <div class="module-body"><div class="module-body-inner">
+            <div class="body-section">
+              <h4>📌 Scenarios to practise</h4>
+              <ul>
+                <li><strong>Scenario 1 — "I'm not actively looking":</strong> Don't argue or push. Ask: "That's completely fine — out of curiosity, what would need to change in your current role for you to consider a move?" Listen. You're planting a seed, not closing a deal today.</li>
+                <li><strong>Scenario 2 — "I already have an interview elsewhere":</strong> Great news — they're clearly open to moving. Say: "That's brilliant, hopefully that goes well. While you're exploring options, it's always worth having a conversation — this role has [X advantage]. Can I tell you about it quickly?" Keep it brief.</li>
+                <li><strong>Scenario 3 — No response after initial contact:</strong> Execute the 3-touch WhatsApp follow-up. After 3 touches, log it and move on. Never send a 4th message — it damages the brand.</li>
+                <li><strong>Scenario 4 — "What's the salary?":</strong> If you don't have the exact figure yet: "The salary is competitive for the sector — I'm confirming the exact figure with the client today and will come back to you. In the meantime, what's your current package?" Redirect to gather information.</li>
+                <li><strong>Scenario 5 — Candidate withdraws after submission:</strong> Stay professional — this happens. Inform the DC immediately. Ask the candidate what changed — you may be able to resolve it or use the intel for future. Log everything in the CRM.</li>
+              </ul>
+            </div>
+            <div class="tip-box"><strong>💡 Role play tip:</strong> Ask your trainer to make it difficult — give you a rude candidate, a last-minute withdrawal, an unexpected question. The more uncomfortable it feels in role play, the more comfortable you'll be when it happens for real.</div>
+            <div class="status-controls">
+              <button class="status-btn start" onclick="setStatus('mod-w3-2','in-progress')">▶ In Progress</button>
+              <button class="status-btn complete" onclick="setStatus('mod-w3-2','done')">✓ Complete</button>
+              <button class="status-btn reset" onclick="setStatus('mod-w3-2','todo')">↺ Reset</button>
+            </div>
+          </div></div>
+        </div>
+
+        <div class="module" id="mod-w3-3">
+          <div class="module-header" onclick="toggleModule('mod-w3-3')">
+            <div class="module-check" id="check-mod-w3-3"></div>
+            <div class="module-emoji">📄</div>
+            <div class="module-info"><div class="module-title">Writing & Submitting CVs to Clients</div><div class="module-meta">Thu 24 Jul · Trainer-led · ~2 hours</div></div>
+            <span class="module-type type-trained">TRAINED</span><span class="expand-icon">▶</span>
+          </div>
+          <div class="module-body"><div class="module-body-inner">
+            <div class="body-section">
+              <h4>📌 What to learn</h4>
+              <ul>
+                <li><strong>Anonymising CVs:</strong> Remove the candidate's name, address, and contact details before sending to a client. They should only see skills, experience and qualifications. Winlight's name goes on the covering email — this protects the candidate from being contacted directly.</li>
+                <li><strong>Formatting to Winlight standard:</strong> Use the CV template your trainer provides. Consistent formatting makes us look professional and makes it easy for clients to compare candidates.</li>
+                <li><strong>The cover note:</strong> One paragraph per CV telling the client why this specific person fits this specific role. Don't repeat the CV — add context: "Chloe has 3 years of LD residential experience and is available from Monday. She is based 10 minutes from your Bristol service." Specific, relevant, brief.</li>
+                <li><strong>Compliance check before submission:</strong> RTW confirmed? DBS type confirmed, status tracked? Candidate consent given? If any of these are missing — do not submit. Log the reason in the CRM and resolve it.</li>
+                <li><strong>The submission email:</strong> CC your DC. Subject line format: [SUBMISSION] – [Role] – [Client] – [Candidate initials]. Body: brief intro + cover note per candidate + attach formatted CVs. Acknowledge any specific requirements the client mentioned.</li>
+              </ul>
+            </div>
+            <div class="quiz-section">
+              <h4>🧠 Knowledge Check</h4>
+              <div class="quiz-q" id="qw3-3-1">
+                <p>Why do we remove the candidate's name and contact details from CVs before sending to clients?</p>
+                <button class="quiz-opt" onclick="answerQ(this,false,'qw3-3-1')">To make the CV look cleaner and more professional</button>
+                <button class="quiz-opt" onclick="answerQ(this,true,'qw3-3-1')">To protect the candidate from being contacted directly, bypassing Winlight</button>
+                <button class="quiz-opt" onclick="answerQ(this,false,'qw3-3-1')">It's a GDPR requirement for all submissions</button>
+              </div>
+            </div>
+            <div class="status-controls">
+              <button class="status-btn start" onclick="setStatus('mod-w3-3','in-progress')">▶ In Progress</button>
+              <button class="status-btn complete" onclick="setStatus('mod-w3-3','done')">✓ Complete</button>
+              <button class="status-btn reset" onclick="setStatus('mod-w3-3','todo')">↺ Reset</button>
+            </div>
+          </div></div>
+        </div>
+
+        <div class="module" id="mod-w3-4">
+          <div class="module-header" onclick="toggleModule('mod-w3-4')">
+            <div class="module-check" id="check-mod-w3-4"></div>
+            <div class="module-emoji">🆙</div>
+            <div class="module-info"><div class="module-title">Escalation Process — When to Go to Your DC</div><div class="module-meta">Thu 24 Jul · Trainer-led · ~45 mins</div></div>
+            <span class="module-type type-trained">TRAINED</span><span class="expand-icon">▶</span>
+          </div>
+          <div class="module-body"><div class="module-body-inner">
+            <div class="body-section">
+              <h4>📌 What to escalate — and how</h4>
+              <ul>
+                <li><strong>Always escalate:</strong> Compliance issues (missing RTW or DBS), a candidate raising a safeguarding concern, a client making an unreasonable or discriminatory request, any threat or abusive behaviour from a candidate.</li>
+                <li><strong>Escalate quickly:</strong> A candidate withdrawing on the same day they're due to start, a client rejecting a submission without feedback (the DC needs to find out why), salary negotiation conversations.</li>
+                <li><strong>How to brief your DC:</strong> Be concise. "I have a situation — Candidate X has just called and said they won't be starting tomorrow. They gave [reason]. I've logged it in the CRM. What do you want to do?" Don't bring the problem without having logged it first.</li>
+                <li><strong>Don't escalate unnecessarily:</strong> If a candidate doesn't answer the phone, that's not an escalation. Use your judgment — ask yourself: "Can I resolve this myself within my remit?" If yes, do it and log it. If no, escalate.</li>
+              </ul>
+            </div>
+            <div class="status-controls">
+              <button class="status-btn start" onclick="setStatus('mod-w3-4','in-progress')">▶ In Progress</button>
+              <button class="status-btn complete" onclick="setStatus('mod-w3-4','done')">✓ Complete</button>
+              <button class="status-btn reset" onclick="setStatus('mod-w3-4','todo')">↺ Reset</button>
+            </div>
+          </div></div>
+        </div>
+
+        <div class="module" id="mod-w3-5">
+          <div class="module-header" onclick="toggleModule('mod-w3-5')">
+            <div class="module-check" id="check-mod-w3-5"></div>
+            <div class="module-emoji">✅</div>
+            <div class="module-info"><div class="module-title">Mid-Programme Check-In with Manager</div><div class="module-meta">Fri 25 Jul · With Jess / Kaz · ~45 mins</div></div>
+            <span class="module-type type-checkin">CHECK-IN</span><span class="expand-icon">▶</span>
+          </div>
+          <div class="module-body"><div class="module-body-inner">
+            <div class="body-section">
+              <h4>📌 How to prepare</h4>
+              <ul>
+                <li>Pull your call stats and CRM activity for Weeks 1–3. Know your numbers before you walk in.</li>
+                <li>Prepare two things you feel genuinely confident about now.</li>
+                <li>Prepare two specific areas where you'd like more support or practice.</li>
+                <li>Think about whether your daily structure is working. Are you hitting your call targets? If not, what's getting in the way?</li>
+                <li>This is a two-way conversation — you're expected to contribute, not just receive feedback. Ask questions.</li>
+              </ul>
+            </div>
+            <div class="tip-box"><strong>💡 Being direct is respected here.</strong> If something isn't working — your tools, your onboarding, the level of support — say so. Jess and Kaz would rather hear it now than at the end of Week 5.</div>
+            <div class="status-controls">
+              <button class="status-btn start" onclick="setStatus('mod-w3-5','in-progress')">▶ In Progress</button>
+              <button class="status-btn complete" onclick="setStatus('mod-w3-5','done')">✓ Complete</button>
+              <button class="status-btn reset" onclick="setStatus('mod-w3-5','todo')">↺ Reset</button>
+            </div>
+          </div></div>
+        </div>
+
+      </div>
+    </div><!-- end week 3 -->
+
+    <!-- ═══════════════════ WEEK 4 ═══════════════════ -->
+    <div class="week-panel" id="week-4">
+      <div class="week-header">
+        <div><h2>Week 4 — Consolidation & Independent Working</h2><div class="week-dates">28 July – 1 August 2026</div></div>
+        <div class="week-badge" id="badge-4">0%</div>
+      </div>
+      <div class="week-body">
+
+        <div class="module" id="mod-w4-1">
+          <div class="module-header" onclick="toggleModule('mod-w4-1')">
+            <div class="module-check" id="check-mod-w4-1"></div>
+            <div class="module-emoji">🚀</div>
+            <div class="module-info"><div class="module-title">Independent Sourcing — Working Vacancies Solo</div><div class="module-meta">Week of 28 Jul · Trainer available for queries · Full week</div></div>
+            <span class="module-type type-trained">TRAINED</span><span class="expand-icon">▶</span>
+          </div>
+          <div class="module-body"><div class="module-body-inner">
+            <div class="body-section">
+              <h4>📌 What this week involves</h4>
+              <ul>
+                <li>You are now the primary driver of your assigned vacancies. Your trainer is available for questions but won't be directing your daily activity.</li>
+                <li>Start each day by reviewing your live vacancies, checking callback reminders, and setting a call target for the morning session.</li>
+                <li>Track your KPIs daily: calls made, new candidates added to CRM, CVs submitted, responses to submissions. Share these with your DC at end-of-day or morning standup.</li>
+                <li>If you're stuck on a vacancy — no candidates, wrong results — try a different search strategy before escalating. Try alternative job titles, widen or narrow the location, check if the vacancy spec is realistic and discuss with your DC if not.</li>
+                <li>Focus on quality of process this week: are your CRM notes complete? Are your CV cover notes specific? Is your follow-up consistent?</li>
+              </ul>
+            </div>
+            <div class="status-controls">
+              <button class="status-btn start" onclick="setStatus('mod-w4-1','in-progress')">▶ In Progress</button>
+              <button class="status-btn complete" onclick="setStatus('mod-w4-1','done')">✓ Complete</button>
+              <button class="status-btn reset" onclick="setStatus('mod-w4-1','todo')">↺ Reset</button>
+            </div>
+          </div></div>
+        </div>
+
+        <div class="module" id="mod-w4-2">
+          <div class="module-header" onclick="toggleModule('mod-w4-2')">
+            <div class="module-check" id="check-mod-w4-2"></div>
+            <div class="module-emoji">🎭</div>
+            <div class="module-info"><div class="module-title">Role Play: Full End-to-End Candidate Process</div><div class="module-meta">Wed 30 Jul · Role play activity · ~2 hours</div></div>
+            <span class="module-type type-roleplay">ROLE PLAY</span><span class="expand-icon">▶</span>
+          </div>
+          <div class="module-body"><div class="module-body-inner">
+            <div class="body-section">
+              <h4>📌 The scenario</h4>
+              <ul>
+                <li>You are the Resourcer. Your trainer plays both a candidate and a client contact.</li>
+                <li><strong>Stage 1:</strong> You receive a new vacancy brief from the "client" (trainer). You ask clarifying questions: What's the urgency? What experience is non-negotiable? What's the package? Interview process?</li>
+                <li><strong>Stage 2:</strong> You "source" and screen the candidate (trainer switches role). Full screening call — qualify experience, compliance status, motivation, availability.</li>
+                <li><strong>Stage 3:</strong> You prepare the CV and cover note (can be done before the session, or live). Present your submission to the "client."</li>
+                <li><strong>Stage 4:</strong> Complication — the candidate calls to say they've accepted another offer. How do you handle it with the candidate? How do you communicate it to your DC and client?</li>
+              </ul>
+            </div>
+            <div class="status-controls">
+              <button class="status-btn start" onclick="setStatus('mod-w4-2','in-progress')">▶ In Progress</button>
+              <button class="status-btn complete" onclick="setStatus('mod-w4-2','done')">✓ Complete</button>
+              <button class="status-btn reset" onclick="setStatus('mod-w4-2','todo')">↺ Reset</button>
+            </div>
+          </div></div>
+        </div>
+
+        <div class="module" id="mod-w4-3">
+          <div class="module-header" onclick="toggleModule('mod-w4-3')">
+            <div class="module-check" id="check-mod-w4-3"></div>
+            <div class="module-emoji">📊</div>
+            <div class="module-info"><div class="module-title">KPI Review & Week 5 Assessment Preparation</div><div class="module-meta">Fri 1 Aug · Self-led + brief discussion · ~1 hour</div></div>
+            <span class="module-type type-checkin">CHECK-IN</span><span class="expand-icon">▶</span>
+          </div>
+          <div class="module-body"><div class="module-body-inner">
+            <div class="body-section">
+              <h4>📌 How to prepare</h4>
+              <ul>
+                <li>Pull your call and submission statistics from the CRM for Weeks 3 and 4. How do they compare to your targets?</li>
+                <li>Write a short self-assessment (even bullet points): three strengths you've developed, two areas you're still working on, one thing you'd do differently if you started Week 1 again.</li>
+                <li>Re-read the full handbook one more time. Flag anything you don't feel confident on and ask your trainer before the assessment.</li>
+                <li>Prepare two or three questions to ask in the Week 5 feedback session — showing you've reflected and engaged will matter.</li>
+              </ul>
+            </div>
+            <div class="tip-box"><strong>💡 Honesty is a strength here.</strong> Managers are far more reassured by someone who says "I know I need to improve my call-to-submission ratio and here's what I'm doing about it" than someone who oversells themselves. Self-awareness is a key recruiter quality.</div>
+            <div class="status-controls">
+              <button class="status-btn start" onclick="setStatus('mod-w4-3','in-progress')">▶ In Progress</button>
+              <button class="status-btn complete" onclick="setStatus('mod-w4-3','done')">✓ Complete</button>
+              <button class="status-btn reset" onclick="setStatus('mod-w4-3','todo')">↺ Reset</button>
+            </div>
+          </div></div>
+        </div>
+
+      </div>
+    </div><!-- end week 4 -->
+
+    <!-- ═══════════════════ WEEK 5 ═══════════════════ -->
+    <div class="week-panel" id="week-5">
+      <div class="week-header">
+        <div><h2>Week 5 — Assessment & Sign-Off</h2><div class="week-dates">4–8 August 2026</div></div>
+        <div class="week-badge" id="badge-5">0%</div>
+      </div>
+      <div class="week-body">
+
+        <div class="module" id="mod-w5-1">
+          <div class="module-header" onclick="toggleModule('mod-w5-1')">
+            <div class="module-check" id="check-mod-w5-1"></div>
+            <div class="module-emoji">📝</div>
+            <div class="module-info"><div class="module-title">Final Sector Knowledge Assessment</div><div class="module-meta">Mon 4 Aug · With Jess · ~1 hour</div></div>
+            <span class="module-type type-assessment">ASSESSMENT</span><span class="expand-icon">▶</span>
+          </div>
+          <div class="module-body"><div class="module-body-inner">
+            <div class="body-section">
+              <h4>📌 What to prepare for</h4>
+              <ul>
+                <li><strong>Sector knowledge:</strong> Types of social care service, common job titles, qualifications required at each level. Be specific — "NVQ Level 2 for Support Worker, Level 5 for Registered Manager."</li>
+                <li><strong>Legislation:</strong> DBS levels and when each applies. RTW — what documents are accepted. GDPR — candidate consent for CV sharing.</li>
+                <li><strong>Resourcer role:</strong> The full candidate lifecycle. Your KPIs. How to prioritise vacancies. When to escalate to your DC.</li>
+                <li><strong>Practical exercise:</strong> You'll be given a mock vacancy brief and asked to demonstrate a Boolean search or walk through how you'd approach filling the role.</li>
+                <li><strong>Language and professionalism:</strong> You may be asked how you'd handle a specific scenario — use the language of the sector, speak person-first, and show judgment.</li>
+              </ul>
+            </div>
+            <div class="quiz-section">
+              <h4>🧠 Final Revision Quiz</h4>
+              <div class="quiz-q" id="qw5-1-1">
+                <p>What DBS check level is required for a Support Worker in a residential LD service?</p>
+                <button class="quiz-opt" onclick="answerQ(this,false,'qw5-1-1')">Basic DBS</button>
+                <button class="quiz-opt" onclick="answerQ(this,false,'qw5-1-1')">Standard DBS</button>
+                <button class="quiz-opt" onclick="answerQ(this,true,'qw5-1-1')">Enhanced DBS with barred lists check</button>
+              </div>
+              <div class="quiz-q" id="qw5-1-2">
+                <p>A client is urgently requesting a temp worker for tonight. The candidate's compliance isn't complete. What is the right action?</p>
+                <button class="quiz-opt" onclick="answerQ(this,false,'qw5-1-2')">Submit the candidate and flag the compliance issue after they've started</button>
+                <button class="quiz-opt" onclick="answerQ(this,true,'qw5-1-2')">Do not submit — escalate to the DC and inform the client the placement cannot go ahead tonight</button>
+                <button class="quiz-opt" onclick="answerQ(this,false,'qw5-1-2')">Ask the candidate to sign a self-declaration form and submit them</button>
+              </div>
+              <div class="quiz-q" id="qw5-1-3">
+                <p>What is the purpose of anonymising a CV before sending it to a client?</p>
+                <button class="quiz-opt" onclick="answerQ(this,false,'qw5-1-3')">To comply with GDPR requirements on all candidate submissions</button>
+                <button class="quiz-opt" onclick="answerQ(this,true,'qw5-1-3')">To protect the candidate from being contacted directly and to maintain Winlight's position in the process</button>
+                <button class="quiz-opt" onclick="answerQ(this,false,'qw5-1-3')">To make CVs look cleaner and easier to read</button>
+              </div>
+            </div>
+            <div class="status-controls">
+              <button class="status-btn start" onclick="setStatus('mod-w5-1','in-progress')">▶ In Progress</button>
+              <button class="status-btn complete" onclick="setStatus('mod-w5-1','done')">✓ Complete</button>
+              <button class="status-btn reset" onclick="setStatus('mod-w5-1','todo')">↺ Reset</button>
+            </div>
+          </div></div>
+        </div>
+
+        <div class="module" id="mod-w5-2">
+          <div class="module-header" onclick="toggleModule('mod-w5-2')">
+            <div class="module-check" id="check-mod-w5-2"></div>
+            <div class="module-emoji">💬</div>
+            <div class="module-info"><div class="module-title">Formal Feedback Session with Jess & Kaz</div><div class="module-meta">Wed 6 Aug · Formal review · ~1 hour</div></div>
+            <span class="module-type type-assessment">ASSESSMENT</span><span class="expand-icon">▶</span>
+          </div>
+          <div class="module-body"><div class="module-body-inner">
+            <div class="body-section">
+              <h4>📌 What to expect</h4>
+              <ul>
+                <li>Structured feedback covering your performance across all 5 weeks: knowledge, professionalism, call quality, CRM discipline, team fit.</li>
+                <li>KPI review: your actual numbers vs targets set in Week 1. Be ready to discuss them honestly.</li>
+                <li>Confirmation of probationary expectations and what "good" looks like going into Month 2 and 3.</li>
+                <li>An opportunity for you to give upward feedback — how was the onboarding? What support would help you succeed?</li>
+              </ul>
+            </div>
+            <div class="status-controls">
+              <button class="status-btn start" onclick="setStatus('mod-w5-2','in-progress')">▶ In Progress</button>
+              <button class="status-btn complete" onclick="setStatus('mod-w5-2','done')">✓ Complete</button>
+              <button class="status-btn reset" onclick="setStatus('mod-w5-2','todo')">↺ Reset</button>
+            </div>
+          </div></div>
+        </div>
+
+        <div class="module" id="mod-w5-3">
+          <div class="module-header" onclick="toggleModule('mod-w5-3')">
+            <div class="module-check" id="check-mod-w5-3"></div>
+            <div class="module-emoji">🏆</div>
+            <div class="module-info"><div class="module-title">Programme Sign-Off & 30/60/90-Day Goals</div><div class="module-meta">Fri 8 Aug · Sign-off meeting · ~45 mins</div></div>
+            <span class="module-type type-assessment">ASSESSMENT</span><span class="expand-icon">▶</span>
+          </div>
+          <div class="module-body"><div class="module-body-inner">
+            <div class="body-section">
+              <h4>📌 What this involves</h4>
+              <ul>
+                <li>Formal sign-off on the 5-week onboarding programme — your trainer and manager confirm you've completed all modules and met the baseline standard.</li>
+                <li>Setting your 30/60/90-day goals: what do you want to have achieved in your first 30 days solo? First 3 months? First placement?</li>
+                <li>Identifying any continuing development: are there sector-specific topics you want to go deeper on? Any L&D courses (e.g. a short mental health awareness course) that would help you serve candidates and clients better?</li>
+                <li>Most importantly — well done. Completing 5 weeks of structured onboarding is a real achievement. You now have the foundations to build a strong career in specialist recruitment. 🎉</li>
+              </ul>
+            </div>
+            <div class="status-controls">
+              <button class="status-btn start" onclick="setStatus('mod-w5-3','in-progress')">▶ In Progress</button>
+              <button class="status-btn complete" onclick="setStatus('mod-w5-3','done')">✓ Complete</button>
+              <button class="status-btn reset" onclick="setStatus('mod-w5-3','todo')">↺ Reset</button>
+            </div>
+          </div></div>
+        </div>
+
+      </div>
+    </div><!-- end week 5 -->
+
+  </div><!-- end content -->
+</div><!-- end main -->
+
+<script>
+  const weekModules = {
+    1: ['mod-w1-1','mod-w1-2','mod-w1-3','mod-w1-4','mod-w1-5','mod-w1-6','mod-w1-7'],
+    2: ['mod-w2-1','mod-w2-2','mod-w2-3','mod-w2-4','mod-w2-5','mod-w2-6'],
+    3: ['mod-w3-1','mod-w3-2','mod-w3-3','mod-w3-4','mod-w3-5'],
+    4: ['mod-w4-1','mod-w4-2','mod-w4-3'],
+    5: ['mod-w5-1','mod-w5-2','mod-w5-3']
+  };
+
+  const state = JSON.parse(localStorage.getItem('winlight-rr-training-v2') || '{}');
+
+  function saveState() { localStorage.setItem('winlight-rr-training-v2', JSON.stringify(state)); }
+
+  function setStatus(modId, status) {
+    state[modId] = status;
+    saveState();
+    renderModule(modId);
+    updateProgress();
+  }
+
+  function renderModule(modId) {
+    const check = document.getElementById('check-' + modId);
+    if (!check) return;
+    const s = state[modId] || 'todo';
+    check.className = 'module-check' + (s === 'done' ? ' done' : s === 'in-progress' ? ' in-progress' : '');
+    check.textContent = s === 'done' ? '✓' : s === 'in-progress' ? '●' : '';
+  }
+
+  function updateProgress() {
+    const allMods = Object.values(weekModules).flat();
+    const total = allMods.length;
+    let done = 0, inprog = 0;
+    allMods.forEach(id => {
+      const s = state[id] || 'todo';
+      if (s === 'done') done++;
+      else if (s === 'in-progress') inprog++;
+    });
+    const pct = Math.round((done / total) * 100);
+    document.getElementById('progress-bar').style.width = pct + '%';
+    document.getElementById('progress-pct').textContent = pct + '% complete';
+    document.getElementById('count-done').textContent = done;
+    document.getElementById('count-inprog').textContent = total - done - (total - done - inprog);
+    document.getElementById('count-todo').textContent = total - done - inprog;
+    [1,2,3,4,5].forEach(w => {
+      const mods = weekModules[w];
+      const wDone = mods.filter(id => state[id] === 'done').length;
+      document.getElementById('badge-' + w).textContent = Math.round((wDone/mods.length)*100) + '%';
+      document.getElementById('mini-' + w).textContent = wDone + ' / ' + mods.length + ' done';
+    });
+  }
+
+  function toggleModule(modId) {
+    document.getElementById(modId).classList.toggle('open');
+  }
+
+  function showWeek(n, btn) {
+    document.querySelectorAll('.week-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.week-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('week-' + n).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  function answerQ(btn, correct, qId) {
+    const qDiv = document.getElementById(qId);
+    if (qDiv.dataset.answered) return;
+    qDiv.dataset.answered = 'true';
+    const allOpts = qDiv.querySelectorAll('.quiz-opt');
+    allOpts.forEach(o => o.disabled = true);
+    if (correct) {
+      btn.classList.add('correct');
+      const fb = document.createElement('div');
+      fb.className = 'quiz-feedback correct';
+      fb.textContent = '✓ Correct! Well done.';
+      qDiv.appendChild(fb);
+    } else {
+      btn.classList.add('wrong');
+      allOpts.forEach(o => { if (o !== btn && !o.classList.contains('wrong')) { o.classList.add('reveal'); } });
+      const fb = document.createElement('div');
+      fb.className = 'quiz-feedback wrong';
+      fb.textContent = '✗ Not quite — the correct answer is highlighted in green. Review that section and try again next time.';
+      qDiv.appendChild(fb);
+    }
+  }
+
+  Object.values(weekModules).flat().forEach(id => renderModule(id));
+  updateProgress();
+</script>
+
+<!-- TRAINING ASSISTANT -->
+<style>
+  #chat-fab {
+    position: fixed; bottom: 28px; right: 28px; z-index: 1000;
+    width: 60px; height: 60px; border-radius: 50%;
+    background: #042c4c; color: white; border: none; cursor: pointer;
+    box-shadow: 0 4px 16px rgba(4,44,76,0.4);
+    font-size: 1.6rem; display: flex; align-items: center; justify-content: center;
+    transition: transform 0.2s, background 0.2s;
+  }
+  #chat-fab:hover { transform: scale(1.08); background: #0a3d6b; }
+  #chat-fab .fab-badge {
+    position: absolute; top: -4px; right: -4px;
+    background: #86bbd8; color: #042c4c;
+    font-size: 0.6rem; font-weight: 700; padding: 2px 5px;
+    border-radius: 10px; letter-spacing: 0.3px;
+  }
+  #chat-panel {
+    position: fixed; bottom: 100px; right: 28px; z-index: 999;
+    width: 370px; max-height: 560px;
+    background: white; border-radius: 14px;
+    box-shadow: 0 8px 40px rgba(4,44,76,0.22);
+    display: none; flex-direction: column; overflow: hidden;
+    border: 1.5px solid #86bbd8;
+  }
+  #chat-panel.open { display: flex; }
+  .chat-header {
+    background: #042c4c; color: white;
+    padding: 14px 18px; display: flex; align-items: center; gap: 10px;
+  }
+  .chat-header-icon { font-size: 1.3rem; }
+  .chat-header-text { flex: 1; }
+  .chat-header-text strong { display: block; font-size: 0.95rem; }
+  .chat-header-text span { font-size: 0.75rem; color: #86bbd8; }
+  .chat-close { background: none; border: none; color: white; cursor: pointer; font-size: 1.2rem; opacity: 0.7; padding: 0; }
+  .chat-close:hover { opacity: 1; }
+  .chat-messages {
+    flex: 1; overflow-y: auto; padding: 14px;
+    display: flex; flex-direction: column; gap: 10px;
+    background: #f8fafc;
+  }
+  .chat-msg { max-width: 88%; padding: 9px 13px; border-radius: 12px; font-size: 0.88rem; line-height: 1.5; }
+  .chat-msg.bot { background: #e8f0f7; color: #042c4c; align-self: flex-start; border-bottom-left-radius: 3px; }
+  .chat-msg.user { background: #042c4c; color: white; align-self: flex-end; border-bottom-right-radius: 3px; }
+  .chat-msg .source { font-size: 0.75rem; opacity: 0.65; margin-top: 5px; font-style: italic; }
+  .chat-suggestions { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 14px 6px; background: #f8fafc; }
+  .chat-sug-btn {
+    background: white; border: 1.5px solid #86bbd8; color: #042c4c;
+    border-radius: 20px; padding: 5px 11px; font-size: 0.78rem; cursor: pointer;
+    transition: background 0.15s;
+  }
+  .chat-sug-btn:hover { background: #86bbd8; }
+  .chat-input-row { display: flex; padding: 10px 12px; gap: 8px; border-top: 1px solid #e2e8f0; background: white; }
+  #chat-input {
+    flex: 1; border: 1.5px solid #86bbd8; border-radius: 20px;
+    padding: 8px 14px; font-size: 0.88rem; outline: none;
+    font-family: inherit;
+  }
+  #chat-input:focus { border-color: #042c4c; }
+  #chat-send {
+    background: #042c4c; color: white; border: none; border-radius: 50%;
+    width: 36px; height: 36px; cursor: pointer; font-size: 1rem;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s;
+  }
+  #chat-send:hover { background: #0a3d6b; }
+  .typing-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #042c4c; margin: 0 2px; animation: bounce 1s infinite; }
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-8px)} }
+</style>
+
+<button id="chat-fab" onclick="toggleChat()" title="Ask a question">
+  <span>&#x1F4AC;</span>
+  <span class="fab-badge">ASK</span>
+</button>
+
+<div id="chat-panel">
+  <div class="chat-header">
+    <span class="chat-header-icon">&#x1F916;</span>
+    <div class="chat-header-text">
+      <strong>Training Assistant</strong>
+      <span>Ask me anything about the course</span>
+    </div>
+    <button class="chat-close" onclick="toggleChat()">&#x2715;</button>
+  </div>
+  <div class="chat-messages" id="chat-box">
+    <div class="chat-msg bot">Hi! I am your Winlight training assistant. Ask me anything about social care recruitment, compliance, job roles, or how to use Monday.com. What would you like to know?</div>
+  </div>
+  <div class="chat-suggestions" id="chat-sugs">
+    <button class="chat-sug-btn" onclick="askSug(this)">What is a DBS check?</button>
+    <button class="chat-sug-btn" onclick="askSug(this)">What does RTW mean?</button>
+    <button class="chat-sug-btn" onclick="askSug(this)">What is Boolean search?</button>
+    <button class="chat-sug-btn" onclick="askSug(this)">What is the 3-touch rule?</button>
+  </div>
+  <div class="chat-input-row">
+    <input id="chat-input" type="text" placeholder="Type your question..." onkeydown="if(event.key==='Enter')sendChat()">
+    <button id="chat-send" onclick="sendChat()">&#x27A4;</button>
+  </div>
+</div>
+
+<script>
+var KB = [
+  {tags:["dbs","disclosure","barring","check","criminal","record"],a:"A DBS (Disclosure and Barring Service) check is a background check that reveals a candidate's criminal record. In social care, an Enhanced DBS is required for roles working with vulnerable adults or children. It is a mandatory compliance step before a candidate can start work.",source:"Week 1 - Legislation & Compliance"},
+  {tags:["rtw","right to work","visa","passport","id","identity"],a:"Right to Work (RTW) checks verify that a candidate has legal permission to work in the UK. You must check original documents (passport, visa, share code) before the candidate starts. It is a legal requirement and failure to check can result in significant fines for the employer.",source:"Week 1 - Legislation & Compliance"},
+  {tags:["social care","sector","what is","overview","industry"],a:"Social care covers support services for vulnerable adults, children, and families. In recruitment, you will be placing candidates into roles such as Support Workers, Care Assistants, and Registered Managers into care homes, supported living, domiciliary care, and NHS settings.",source:"Week 1 - Sector Overview"},
+  {tags:["ld","learning disability","learning disabilities","autism","asd","complex needs"],a:"Learning Disabilities (LD) is a key specialism in social care. Common conditions include Down Syndrome, Autism Spectrum Disorder (ASD), and ADHD. Candidates for LD roles need patience, communication skills, and often specific training like Makaton or PBS.",source:"Week 1 - LD & Related Conditions"},
+  {tags:["support worker","care assistant","job title","roles","senior support worker"],a:"Common job titles in social care include: Support Worker, Senior Support Worker, Care Assistant, Team Leader, Deputy Manager, Registered Manager, and Waking Night Support Worker. Each has different experience requirements and pay rates.",source:"Week 1 - Job Titles"},
+  {tags:["boolean","search","sourcing","linkedin","reed","boolean search","cv search"],a:"Boolean search uses operators to find candidates on job boards and LinkedIn. Key operators: AND (both terms), OR (either term), NOT (exclude term). Example: 'Support Worker' AND (Leeds OR Bradford) AND 'DBS'. Use quotation marks for exact phrases.",source:"Week 3 - Sourcing & Boolean Search"},
+  {tags:["monday","monday.com","board","tracker","how to use","crm"],a:"Monday.com is Winlight's CRM system. Key boards include the Candidate Tracker, Vacancy Tracker, and L&D Board. When you find a candidate, add them to the Candidate Tracker with their name, role, location, compliance status, and notes. Keep it updated daily.",source:"Week 2 - Monday.com"},
+  {tags:["3 touch","three touch","follow up","follow-up","contact","touchpoint"],a:"The 3-touch follow-up rule means contacting a candidate at least 3 times before giving up. Vary the method: call, email, then text or LinkedIn. Note each attempt in Monday.com. Persistence is key in recruitment as candidates often miss the first contact.",source:"Week 3 - Candidate Management"},
+  {tags:["compliance","checklist","references","right to work","mandatory"],a:"Compliance for a social care candidate includes: Enhanced DBS, Right to Work documents, 2 references (one from most recent employer), proof of qualifications, mandatory training certificates (Manual Handling, Safeguarding, First Aid), and a completed application form.",source:"Week 1 - Compliance"},
+  {tags:["safeguarding","vulnerable","abuse","duty of care"],a:"Safeguarding means protecting vulnerable adults and children from abuse, neglect, or harm. In recruitment, if a candidate discloses something concerning, or if a client raises a safeguarding issue, you must escalate to your manager immediately. Never ignore a safeguarding concern.",source:"Week 1 - Legislation"},
+  {tags:["care quality commission","cqc","inspection","rating","ofsted"],a:"The Care Quality Commission (CQC) regulates and inspects adult social care services in England. Ratings are: Outstanding, Good, Requires Improvement, Inadequate. Clients with Good or Outstanding ratings are generally preferred placements. CQC ratings are publicly available at cqc.org.uk.",source:"Week 1 - Sector Overview"},
+  {tags:["domiciliary","dom care","home care","community"],a:"Domiciliary care (dom care) is care provided in a person's own home. Support Workers visit service users at home to assist with personal care, medication, and daily tasks. Dom care roles often involve driving and flexible shift patterns.",source:"Week 1 - Sector Overview"},
+  {tags:["supported living","residential","care home","setting"],a:"Supported Living means people with care needs live in their own home or shared accommodation with support. Residential care homes provide 24-hour care on-site. Understanding the setting helps you match candidates to the right environment.",source:"Week 1 - Sector Overview"},
+  {tags:["pay rate","margin","charge rate","ltd","umbrella","paye"],a:"Pay rates vary by role and setting. As a resourcer you will see charge rates (what we bill the client) and pay rates (what the candidate earns). Candidates can be paid via PAYE, umbrella company, or Ltd company. Always confirm pay type before submission.",source:"Week 2 - Commercial Awareness"},
+  {tags:["kpi","target","calls","submissions","placements"],a:"Key KPIs for a Recruitment Resourcer include: number of CV submissions per week, calls made, candidates registered, compliance completed, and placements made. Typical weekly targets will be set by your manager. Track your activity daily in Monday.com.",source:"Week 5 - Performance & KPIs"},
+  {tags:["cv","covering letter","screening","shortlist"],a:"When screening CVs look for: relevant care experience, length of employment (flag short stints), DBS status, qualifications, and location vs job location. A good CV screen saves time for the consultant. Add shortlisted candidates to the Candidate Tracker with your notes.",source:"Week 2 - CV Screening"},
+  {tags:["interview","register","registration","call"],a:"A registration call or interview covers: candidate's experience, availability, shift preferences, pay expectations, compliance status, and references. Use the registration template in Monday.com. Always confirm RTW documents and DBS at this stage.",source:"Week 2 - Candidate Registration"},
+  {tags:["shift","rota","nights","waking night","sleep in","days"],a:"Common shift patterns in social care: day shifts (7am-3pm or 8am-4pm), late shifts (2pm-10pm), night shifts (10pm-7am), waking nights (worker stays awake all night), sleep-ins (worker sleeps on site, on-call). Always clarify shift patterns with candidates before submission.",source:"Week 1 - Job Titles"},
+  {tags:["winlight","company","team","sch","division","about"],a:"Winlight is a specialist recruitment agency. The SCH (Social Care & Housing) division places candidates into social care, supported living, domiciliary care, and housing-related roles. The team is led by Kaz Rajani and includes consultants and resourcers across the division.",source:"Week 1 - Welcome & Induction"},
+  {tags:["reference","referee","employer reference"],a:"Two references are required for compliance — ideally one from the most recent employer. References must cover at least the last 3 years. You can request references by email using the standard Winlight template. Chase references after 48 hours if not received.",source:"Week 1 - Compliance"},
+  {tags:["makaton","sign language","communication","bsl"],a:"Makaton is a language programme using signs and symbols to support communication for people with learning disabilities or communication difficulties. Some care roles require Makaton trained staff. It is different from BSL (British Sign Language).",source:"Week 1 - LD Conditions"},
+  {tags:["pbs","positive behaviour support","challenging behaviour"],a:"Positive Behaviour Support (PBS) is a framework used in learning disability care to understand and reduce challenging behaviour. PBS-trained candidates are highly sought after in LD settings. It focuses on quality of life and prevention rather than reaction.",source:"Week 1 - LD Conditions"},
+  {tags:["medication","mab","medication administration","dispensing"],a:"Medication Administration and handling (MAB) is a key qualification in care. Candidates who can administer medication are more placeable and often command higher pay rates. Check for a valid MAB certificate during compliance.",source:"Week 1 - Compliance"},
+  {tags:["housing","housing support","tenancy","floating support"],a:"Housing support roles help individuals maintain their tenancy, budget, and independent living skills. It crosses over with social care. Housing Support Workers are different from care workers and may not require an Enhanced DBS in all cases.",source:"Week 1 - Sector Overview"},
+  {tags:["nhs","bank","agency","framework","asc"],a:"NHS and local authority frameworks set the approved suppliers for temporary and permanent care staff. Winlight works with various frameworks. Agency workers placed into NHS settings may have additional compliance requirements such as occupational health checks.",source:"Week 2 - Client Types"},
+  {tags:["candidate","attract","advertise","job board","reed","cv library","indeed"],a:"Candidates are found through: job board adverts (Reed, CV-Library, Indeed), LinkedIn, referrals, and database searches. Write clear adverts with the job title, location, pay rate, shift pattern, and requirements. Use Boolean search to proactively source candidates.",source:"Week 3 - Sourcing"},
+  {tags:["vacancy","job","order","temp","permanent","perm","contract"],a:"A vacancy (or order) is a live requirement from a client. Temp vacancies are urgent and require fast turnaround. Perm vacancies allow more time. When a vacancy comes in, check the job spec, confirm the pay and charge rates, and start sourcing immediately.",source:"Week 2 - Working Vacancies"},
+];
+
+function toggleChat() {
+  var panel = document.getElementById('chat-panel');
+  panel.classList.toggle('open');
+}
+
+function askSug(btn) {
+  var input = document.getElementById('chat-input');
+  input.value = btn.textContent;
+  sendChat();
+}
+
+function sendChat() {
+  var input = document.getElementById('chat-input');
+  var q = input.value.trim();
+  if (!q) return;
+  input.value = '';
+  appendMsg(q, 'user');
+  var typing = appendTyping();
+  setTimeout(function() {
+    typing.remove();
+    var result = search(q);
+    var msg = appendMsg(result.answer, 'bot');
+    if (result.source) {
+      var src = document.createElement('div');
+      src.className = 'source';
+      src.textContent = 'Source: ' + result.source;
+      msg.appendChild(src);
+    }
+  }, 700);
+}
+
+function appendMsg(text, type) {
+  var box = document.getElementById('chat-box');
+  var div = document.createElement('div');
+  div.className = 'chat-msg ' + type;
+  div.textContent = text;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+  return div;
+}
+
+function appendTyping() {
+  var box = document.getElementById('chat-box');
+  var div = document.createElement('div');
+  div.className = 'chat-msg bot';
+  div.innerHTML = '<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>';
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+  return div;
+}
+
+function search(query) {
+  var q = query.toLowerCase().replace(/[?!.,]/g, '');
+  var words = q.split(/\s+/).filter(function(w){ return w.length > 2; });
+  var best = null, bestScore = 0;
+  for (var i = 0; i < KB.length; i++) {
+    var entry = KB[i];
+    var score = 0;
+    for (var t = 0; t < entry.tags.length; t++) {
+      if (q.indexOf(entry.tags[t]) !== -1) score += 3;
+    }
+    for (var w = 0; w < words.length; w++) {
+      for (var t = 0; t < entry.tags.length; t++) {
+        if (entry.tags[t].indexOf(words[w]) !== -1 || words[w].indexOf(entry.tags[t]) !== -1) score += 1;
+      }
+      if (entry.a.toLowerCase().indexOf(words[w]) !== -1) score += 0.5;
+    }
+    if (score > bestScore) { bestScore = score; best = entry; }
+  }
+  if (best && bestScore > 0.5) return { answer: best.a, source: best.source };
+  return { answer: "I don't have a specific answer for that in my training content. Try rephrasing, or check the relevant week's module in the guide above. You can also ask your Delivery Consultant or Ria.", source: null };
+}
+</script>
+</body>
+</html>
